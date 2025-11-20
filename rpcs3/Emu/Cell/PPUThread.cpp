@@ -810,6 +810,9 @@ static void ppu_far_jump(ppu_thread&, ppu_opcode_t, be_t<u32>*, ppu_intrp_func*)
 
 extern void ppu_register_function_at(u32 addr, u32 size, ppu_intrp_func_t ptr = nullptr)
 {
+	size = utils::align<u32>(size + addr % 4, 4); // Align size to nearest word
+	addr &= -4;
+
 	// Initialize specific function
 	if (ptr)
 	{
@@ -822,16 +825,6 @@ extern void ppu_register_function_at(u32 addr, u32 size, ppu_intrp_func_t ptr = 
 		if (g_cfg.core.ppu_debug)
 		{
 			ppu_log.error("ppu_register_function_at(0x%x): empty range", addr);
-		}
-
-		return;
-	}
-
-	if (size % 4 != 0) 
-	{
-		if (g_cfg.core.ppu_debug)
-		{
-			ppu_log.error("ppu_register_function_at(0x%x): size not word aligned", addr);
 		}
 
 		return;
